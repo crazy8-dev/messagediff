@@ -17,6 +17,12 @@ type BytesDifferent struct {
 	From, To interface{}
 }
 
+type Equaled interface {
+	Equal(b interface{}) bool
+}
+
+var equalType = reflect.TypeOf((*Equaled)(nil)).Elem()
+
 // PrettyDiff does a deep comparison and returns the nicely formated results.
 // See DeepDiff for more details.
 func PrettyDiff(a, b interface{}, options ...Option) (string, bool) {
@@ -134,6 +140,24 @@ func (d *Diff) diff(aVal, bVal reflect.Value, path Path, opts *opts) bool {
 		if (aVal.IsNil() || bVal.IsNil()) && (kind != reflect.Slice || !opts.sliceWeakEmpty) {
 			d.Modified[&localPath] = &Different{aVal.Interface(), bVal.Interface()}
 			return false
+		}
+	}
+
+	if aVal.Type().Implements(equalType) {
+		if eqFunc := aVal.MethodByName("Equal"); eqFunc.IsValid() && eqFunc.CanInterface() {
+			res := eqFunc.Call([]reflect.Value{bVal})
+			if res[0].Bool() {
+				return true
+			}
+		}
+	}
+
+	if reflect.PtrTo(aVal.Type()).Implements(equalType) && aVal.CanAddr() && bVal.CanAddr() {
+		if eqFunc := aVal.Addr().MethodByName("Equal"); eqFunc.IsValid() && eqFunc.CanInterface() {
+			res := eqFunc.Call([]reflect.Value{bVal.Addr()})
+			if res[0].Bool() {
+				return true
+			}
 		}
 	}
 

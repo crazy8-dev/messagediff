@@ -1,7 +1,7 @@
 # messagediff
 
-A library for doing diffs of arbitrary Golang structs. Fork of [d4l3k/messagediff](https://github.com/d4l3k/messagediff).
-Go-moduled, more options.
+A library for doing diffs of arbitrary Golang structs. Fork of [protolambda/messagediff](https://github.com/protolambda/messagediff).
+Go-moduled, Added check by Equal() if inteface is implemented.
 
 If the unsafe package is available messagediff will diff unexported fields in
 addition to exported fields. This is primarily used for testing purposes as it
@@ -19,7 +19,7 @@ Options:
 ```go
 package main
 
-import "github.com/protolambda/messagediff"
+import "github.com/insolar/messagediff"
 
 type someStruct struct {
     A, b int
@@ -44,7 +44,7 @@ func main() {
 ### Test usage example
 
 ```go
-import "github.com/protolambda/messagediff"
+import "github.com/insolar/messagediff"
 
 ...
 
@@ -69,7 +69,7 @@ this:
 ```go
 package main
 
-import "github.com/protolambda/messagediff"
+import "github.com/insolar/messagediff"
 
 type someStruct struct {
     A int
